@@ -1,18 +1,2559 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brutalist Beats</title>
+  <meta name="theme-color" content="#0b0b0b" />
+  <meta name="description"
+    content="BRUTALIFY — bibliothèque musicale brutaliste noir & blanc. Les titres et pochettes s'affichent pour tous, la lecture ne s'ouvre que si le MP3 existe sur votre stockage." />
+  <title>BRUTALIFY — BIBLIOTHÈQUE MP3 NOIR &amp; BLANC</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       NEOBRUTALISM MINIMALISM — NOIR / BLANC / GRIS
+       square corners · strong black borders · flat blocking
+       ============================================================ */
+
+    :root {
+      --ink: #0b0b0b;
+      --paper: #ffffff;
+      --g1: #f4f4f4;
+      --g2: #e7e7e7;
+      --g3: #d3d3d3;
+      --g4: #a9a9a9;
+      --g5: #6f6f6f;
+      --g6: #3c3c3c;
+      --bw: 3px;
+      --sh: 6px 6px 0 var(--ink);
+      --sh-lg: 10px 10px 0 var(--ink);
+      --font-d: "Archivo", "Arial Black", "Helvetica Neue", Helvetica, sans-serif;
+      --font-m: "Space Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      --player-h: 106px;
+      --ease: cubic-bezier(.2, .8, .2, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-m);
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgba(11, 11, 11, .05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(11, 11, 11, .05) 1px, transparent 1px);
+      background-size: 30px 30px;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    ::selection {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    /* ---------- shared blocks ---------- */
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: var(--paper);
+      border: var(--bw) solid var(--ink);
+      padding: 11px 15px;
+      box-shadow: 4px 4px 0 var(--ink);
+      transition: transform .1s var(--ease), box-shadow .1s var(--ease), background .1s linear;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 var(--ink);
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .btn.primary {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .btn.block {
+      width: 100%;
+    }
+
+    .btn:focus-visible,
+    .chip:focus-visible {
+      outline: 3px dashed var(--ink);
+      outline-offset: 3px;
+    }
+
+    .box {
+      border: var(--bw) solid var(--ink);
+      background: var(--paper);
+      box-shadow: var(--sh);
+      padding: 15px;
+    }
+
+    .box-h {
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: #fff;
+      padding: 7px 9px;
+      margin: -15px -15px 14px;
+      border-bottom: var(--bw) solid var(--ink);
+    }
+
+    .mono-note {
+      font-family: var(--font-m);
+      font-size: 10.5px;
+      line-height: 1.55;
+      letter-spacing: .04em;
+      color: var(--g5);
+      margin: 0;
+    }
+
+    /* ---------- masthead ---------- */
+
+    .masthead {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: var(--paper);
+      border-bottom: var(--bw) solid var(--ink);
+    }
+
+    .ticker {
+      background: var(--ink);
+      color: #fff;
+      overflow: hidden;
+      white-space: nowrap;
+      border-bottom: var(--bw) solid var(--ink);
+      font-weight: 700;
+      font-size: 10.5px;
+      letter-spacing: .24em;
+      padding: 8px 0;
+    }
+
+    .ticker span {
+      display: inline-block;
+      animation: tick 38s linear infinite;
+    }
+
+    @keyframes tick {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    .topbar {
+      display: flex;
+      align-items: stretch;
+      min-height: 76px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      border-right: var(--bw) solid var(--ink);
+    }
+
+    .brand .mark {
+      width: 42px;
+      height: 42px;
+      background: var(--ink);
+      display: grid;
+      place-items: center;
+      flex: none;
+    }
+
+    .brand .mark i {
+      display: block;
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      box-shadow: 13px 0 0 #fff, 0 13px 0 #fff;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 23px;
+      line-height: 1;
+      letter-spacing: -.03em;
+      text-transform: uppercase;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 5px;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: .24em;
+      color: var(--g5);
+      text-transform: uppercase;
+    }
+
+    .search {
+      flex: 1 1 240px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      min-width: 0;
+    }
+
+    .search svg {
+      flex: none;
+    }
+
+    .search input {
+      width: 100%;
+      min-width: 0;
+      border: var(--bw) solid var(--ink);
+      background: var(--g1);
+      color: var(--ink);
+      font-family: var(--font-m);
+      font-weight: 700;
+      font-size: 12.5px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 12px 13px;
+      outline: none;
+      border-radius: 0;
+      transition: background .1s linear, box-shadow .1s var(--ease);
+    }
+
+    .search input:focus {
+      background: var(--paper);
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .search input::placeholder {
+      color: var(--g4);
+    }
+
+    .head-actions {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 18px;
+      border-left: var(--bw) solid var(--ink);
+    }
+
+    .counter {
+      font-weight: 700;
+      font-size: 11.5px;
+      letter-spacing: .1em;
+      background: var(--g2);
+      border: var(--bw) solid var(--ink);
+      padding: 10px 11px;
+      white-space: nowrap;
+    }
+
+    /* ---------- shell ---------- */
+
+    .shell {
+      display: grid;
+      grid-template-columns: 296px minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .sidebar {
+      border-right: var(--bw) solid var(--ink);
+      background: var(--g1);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 17px;
+      overflow-y: auto;
+    }
+
+    .stage {
+      overflow-y: auto;
+      padding: 24px 26px 46px;
+      min-width: 0;
+    }
+
+    /* storage box */
+
+    .big {
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 56px;
+      line-height: .85;
+      letter-spacing: -.05em;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 13px;
+    }
+
+    .big em {
+      font-style: normal;
+      font-size: 20px;
+      color: var(--g4);
+      letter-spacing: -.02em;
+    }
+
+    .segs {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      margin-bottom: 13px;
+    }
+
+    .segs i {
+      display: block;
+      aspect-ratio: 1;
+      border: 2px solid var(--ink);
+      background: var(--paper);
+    }
+
+    .segs i.on {
+      background: var(--ink);
+    }
+
+    .drop-hint {
+      margin-top: 12px;
+      border: var(--bw) dashed var(--ink);
+      background: var(--g2);
+      padding: 13px 10px;
+      text-align: center;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--g6);
+    }
+
+    .stack {
+      display: grid;
+      gap: 9px;
+      margin-top: 13px;
+    }
+
+    /* filters */
+
+    .chips {
+      display: grid;
+      gap: 9px;
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      border: var(--bw) solid var(--ink);
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 11px 12px;
+      transition: transform .1s var(--ease), box-shadow .1s var(--ease);
+    }
+
+    .chip b {
+      font-family: var(--font-m);
+      font-size: 11px;
+      background: var(--g2);
+      border: 2px solid var(--ink);
+      padding: 2px 7px;
+    }
+
+    .chip:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .chip.on {
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .chip.on b {
+      background: #fff;
+      color: var(--ink);
+      border-color: #fff;
+    }
+
+    /* rules box */
+
+    .rulelist {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 11px;
+    }
+
+    .rulelist li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .rulelist b {
+      flex: none;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 12px;
+      background: var(--ink);
+      color: #fff;
+      padding: 5px 7px;
+      line-height: 1;
+    }
+
+    .rulelist span {
+      font-size: 10.5px;
+      line-height: 1.5;
+      color: var(--g6);
+      letter-spacing: .03em;
+    }
+
+    .rulelist strong {
+      display: block;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    /* ---------- hero ---------- */
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.45fr .95fr;
+      gap: 26px;
+      border: var(--bw) solid var(--ink);
+      background: var(--paper);
+      box-shadow: var(--sh-lg);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .kicker {
+      display: inline-block;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: #fff;
+      padding: 6px 9px;
+      margin-bottom: 16px;
+    }
+
+    .hero h2 {
+      margin: 0 0 15px;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: .93;
+      letter-spacing: -.035em;
+      text-transform: uppercase;
+    }
+
+    .hero h2 mark {
+      background: var(--ink);
+      color: #fff;
+      padding: 0 .1em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 56ch;
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: var(--g6);
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .hint {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      color: var(--g5);
+      text-transform: uppercase;
+    }
+
+    .panel {
+      border: var(--bw) solid var(--ink);
+      background: var(--g1);
+      align-self: start;
+    }
+
+    .panel-h {
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: #fff;
+      padding: 9px 12px;
+      border-bottom: var(--bw) solid var(--ink);
+    }
+
+    .panel ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .panel ol li {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 14px 13px;
+      border-bottom: var(--bw) solid var(--ink);
+    }
+
+    .panel ol li:last-child {
+      border-bottom: 0;
+    }
+
+    .panel ol b {
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--ink);
+      flex: none;
+      min-width: 40px;
+    }
+
+    .panel ol strong {
+      display: block;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .panel ol span {
+      font-size: 10.5px;
+      line-height: 1.5;
+      color: var(--g5);
+      letter-spacing: .03em;
+    }
+
+    /* ---------- notice ---------- */
+
+    .notice {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border: var(--bw) solid var(--ink);
+      background: var(--g2);
+      background-image: repeating-linear-gradient(45deg, transparent 0 9px, rgba(11, 11, 11, .07) 9px 18px);
+      box-shadow: var(--sh);
+      padding: 17px 19px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .notice[hidden] {
+      display: none;
+    }
+
+    .notice-ic {
+      flex: none;
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: #fff;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .notice h4 {
+      margin: 0 0 4px;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .notice p {
+      margin: 0;
+      font-size: 11.5px;
+      line-height: 1.55;
+      color: var(--g6);
+      max-width: 68ch;
+    }
+
+    .notice .btn {
+      margin-left: auto;
+    }
+
+    /* ---------- stage head + grid ---------- */
+
+    .stage-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: var(--bw) solid var(--ink);
+      padding-bottom: 11px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .stage-head h3 {
+      margin: 0;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: clamp(22px, 2.6vw, 34px);
+      line-height: 1;
+      letter-spacing: -.03em;
+      text-transform: uppercase;
+    }
+
+    .stage-head .mono {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--g5);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(212px, 1fr));
+      gap: 22px;
+    }
+
+    .empty {
+      border: var(--bw) solid var(--ink);
+      background: var(--g1);
+      box-shadow: var(--sh);
+      padding: 34px 24px;
+      text-align: center;
+    }
+
+    .empty[hidden] {
+      display: none;
+    }
+
+    .empty h4 {
+      margin: 0 0 8px;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 20px;
+      text-transform: uppercase;
+      letter-spacing: -.01em;
+    }
+
+    .empty p {
+      margin: 0;
+      font-size: 11.5px;
+      color: var(--g5);
+      letter-spacing: .05em;
+    }
+
+    /* ---------- card ---------- */
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+      border: var(--bw) solid var(--ink);
+      box-shadow: var(--sh);
+      transition: transform .12s var(--ease), box-shadow .12s var(--ease), background .12s linear;
+      outline: none;
+    }
+
+    .card:hover,
+    .card:focus-visible {
+      transform: translate(-3px, -3px);
+      box-shadow: 9px 9px 0 var(--ink);
+    }
+
+    .card:focus-visible {
+      outline: 3px dashed var(--ink);
+      outline-offset: 4px;
+    }
+
+    .cover {
+      position: relative;
+      aspect-ratio: 1;
+      overflow: hidden;
+      border-bottom: var(--bw) solid var(--ink);
+      background: var(--g3);
+    }
+
+    .cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(1) contrast(1.06);
+    }
+
+    .state {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 3;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      padding: 6px 8px;
+      background: var(--ink);
+      color: #fff;
+      border-left: var(--bw) solid var(--ink);
+      border-bottom: var(--bw) solid var(--ink);
+    }
+
+    .card.ready .state {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .num {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 3;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 12px;
+      padding: 6px 9px;
+      background: var(--paper);
+      color: var(--ink);
+      border-right: var(--bw) solid var(--ink);
+      border-bottom: var(--bw) solid var(--ink);
+    }
+
+    .card.locked .cover img {
+      opacity: .42;
+      filter: grayscale(1) contrast(.55) brightness(1.3);
+    }
+
+    .card.locked .cover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: repeating-linear-gradient(45deg, transparent 0 11px, rgba(11, 11, 11, .3) 11px 14px);
+    }
+
+    .lock {
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 56px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      background: var(--paper);
+      border: var(--bw) solid var(--ink);
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .eq {
+      position: absolute;
+      z-index: 3;
+      left: 10px;
+      bottom: 10px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 28px;
+      padding: 4px;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+    }
+
+    .eq i {
+      display: block;
+      width: 5px;
+      height: 9px;
+      background: var(--ink);
+      animation: eq .9s ease-in-out infinite;
+    }
+
+    .eq i:nth-child(2) {
+      animation-delay: .18s;
+    }
+
+    .eq i:nth-child(3) {
+      animation-delay: .38s;
+    }
+
+    @keyframes eq {
+
+      0%,
+      100% {
+        height: 8px;
+      }
+
+      50% {
+        height: 24px;
+      }
+    }
+
+    .meta {
+      padding: 13px 13px 11px;
+      flex: 1;
+    }
+
+    .meta h4 {
+      margin: 0 0 5px;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 16px;
+      line-height: 1.08;
+      letter-spacing: -.015em;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+    }
+
+    .artist {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: var(--g5);
+      overflow-wrap: anywhere;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 11px;
+      padding-top: 9px;
+      border-top: 2px solid var(--ink);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--g5);
+    }
+
+    .album {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cta {
+      border-top: var(--bw) solid var(--ink);
+      padding: 12px;
+      text-align: center;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    .cta.go {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .card:hover .cta.go {
+      background: var(--g6);
+    }
+
+    .cta.no {
+      color: var(--g5);
+      background-color: var(--g2);
+      background-image: repeating-linear-gradient(45deg, transparent 0 7px, rgba(11, 11, 11, .1) 7px 9px);
+    }
+
+    /* playing state = full inversion */
+    .card.on {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .card.on .artist {
+      color: var(--g3);
+    }
+
+    .card.on .meta-row {
+      border-top-color: #fff;
+      color: var(--g3);
+    }
+
+    .card.on .num {
+      background: var(--ink);
+      color: #fff;
+      border-right-color: #fff;
+      border-bottom-color: #fff;
+    }
+
+    .card.on .state {
+      background: var(--ink);
+      color: #fff;
+      border-left-color: #fff;
+      border-bottom-color: #fff;
+    }
+
+    .card.on .cta.go {
+      background: var(--paper);
+      color: var(--ink);
+      border-top-color: #fff;
+    }
+
+    .card.shake {
+      animation: shake .45s var(--ease);
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20% {
+        transform: translateX(-8px);
+      }
+
+      40% {
+        transform: translateX(7px);
+      }
+
+      60% {
+        transform: translateX(-5px);
+      }
+
+      80% {
+        transform: translateX(4px);
+      }
+    }
+
+    /* ---------- player ---------- */
+
+    .player {
+      height: var(--player-h);
+      border-top: var(--bw) solid var(--ink);
+      background: var(--paper);
+      display: grid;
+      grid-template-columns: minmax(210px, 1fr) minmax(300px, 1.6fr) minmax(200px, 1fr);
+      align-items: center;
+      gap: 20px;
+      padding: 0 20px;
+      z-index: 40;
+    }
+
+    .np {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    .np .art {
+      width: 60px;
+      height: 60px;
+      flex: none;
+      object-fit: cover;
+      border: var(--bw) solid var(--ink);
+      background: var(--g3);
+      filter: grayscale(1);
+    }
+
+    .np .txt {
+      min-width: 0;
+    }
+
+    .np .badge {
+      display: inline-block;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: #fff;
+      padding: 3px 6px;
+      margin-bottom: 5px;
+    }
+
+    .np strong {
+      display: block;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 14px;
+      line-height: 1.15;
+      letter-spacing: -.01em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .np span {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--g5);
+      letter-spacing: .05em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 3px;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .btns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+    }
+
+    .ctrl {
+      min-width: 40px;
+      height: 40px;
+      padding: 0 10px;
+      display: grid;
+      place-items: center;
+      border: var(--bw) solid var(--ink);
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: 13px;
+      line-height: 1;
+      box-shadow: 3px 3px 0 var(--ink);
+      transition: transform .1s var(--ease), box-shadow .1s var(--ease), background .1s linear;
+    }
+
+    .ctrl:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+
+    .ctrl:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .ctrl.main {
+      min-width: 54px;
+      height: 46px;
+      background: var(--ink);
+      color: #fff;
+      font-size: 17px;
+    }
+
+    .ctrl:disabled {
+      opacity: .35;
+      pointer-events: none;
+    }
+
+    .seek-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--g5);
+    }
+
+    .aux {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    .vol {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      color: var(--g5);
+    }
+
+    .local-badge {
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      border: var(--bw) solid var(--ink);
+      background: var(--g2);
+      padding: 7px 8px;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* range inputs — square, bordered, flat fill */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      min-width: 60px;
+      height: 18px;
+      margin: 0;
+      background: linear-gradient(to right, var(--ink) 0 calc(var(--p, 0) * 1%), var(--g3) calc(var(--p, 0) * 1%) 100%);
+      border: var(--bw) solid var(--ink);
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--paper);
+      border: var(--bw) solid var(--ink);
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      background: var(--paper);
+      border: var(--bw) solid var(--ink);
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 12px;
+      background: transparent;
+      border: 0;
+    }
+
+    #seek {
+      flex: 1;
+    }
+
+    #vol {
+      width: 108px;
+      flex: none;
+    }
+
+    #seek:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    /* ---------- toasts ---------- */
+
+    .toasts {
+      position: fixed;
+      right: 18px;
+      bottom: calc(var(--player-h) + 18px);
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      max-width: min(360px, calc(100vw - 36px));
+    }
+
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      border: var(--bw) solid var(--ink);
+      background: var(--paper);
+      box-shadow: var(--sh);
+      padding: 12px 13px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.5;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      animation: pop .22s var(--ease);
+    }
+
+    .toast::before {
+      content: "";
+      flex: none;
+      width: 12px;
+      height: 12px;
+      margin-top: 2px;
+      background: var(--ink);
+      border: 2px solid var(--ink);
+    }
+
+    .toast.bad {
+      background: var(--g2);
+      background-image: repeating-linear-gradient(45deg, transparent 0 8px, rgba(11, 11, 11, .09) 8px 16px);
+    }
+
+    .toast.bad::before {
+      background: var(--paper);
+    }
+
+    .toast.ok {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .toast.ok::before {
+      background: #fff;
+      border-color: #fff;
+    }
+
+    .toast p {
+      margin: 0;
+    }
+
+    @keyframes pop {
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* ---------- drop overlay ---------- */
+
+    .dropzone {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      place-items: center;
+      background: rgba(244, 244, 244, .94);
+      padding: 24px;
+    }
+
+    body.dragging .dropzone {
+      display: grid;
+    }
+
+    .dropzone div {
+      border: 5px solid var(--ink);
+      background: var(--paper);
+      box-shadow: var(--sh-lg);
+      padding: clamp(28px, 7vw, 64px) clamp(24px, 8vw, 80px);
+      text-align: center;
+    }
+
+    .dropzone h3 {
+      margin: 0 0 12px;
+      font-family: var(--font-d);
+      font-weight: 900;
+      font-size: clamp(28px, 6vw, 58px);
+      line-height: .95;
+      letter-spacing: -.04em;
+      text-transform: uppercase;
+    }
+
+    .dropzone p {
+      margin: 0;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--g5);
+    }
+
+    /* ---------- responsive ---------- */
+
+    @media (max-width: 1180px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .head-actions .counter {
+        display: none;
+      }
+    }
+
+    @media (max-width: 980px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow: auto;
+        grid-template-rows: auto auto auto;
+      }
+
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: var(--bw) solid var(--ink);
+        overflow: visible;
+      }
+
+      .stage {
+        overflow: visible;
+        padding: 20px 16px 40px;
+      }
+
+      .player {
+        position: sticky;
+        bottom: 0;
+        grid-template-columns: 1fr;
+        grid-template-areas: "np" "ctrl";
+        height: auto;
+        gap: 11px 14px;
+        padding: 12px 14px;
+      }
+
+      .np {
+        grid-area: np;
+      }
+
+      .controls {
+        grid-area: ctrl;
+        flex-direction: row;
+        align-items: center;
+        gap: 13px;
+      }
+
+      .controls .btns {
+        flex: none;
+      }
+
+      .controls .seek-row {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .aux {
+        display: none;
+      }
+
+      .toasts {
+        bottom: 130px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+      }
+
+      .head-actions {
+        border-left: 0;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .brand {
+        border-right: 0;
+        width: 100%;
+        border-bottom: var(--bw) solid var(--ink);
+      }
+
+      .search {
+        flex: 1 1 100%;
+        order: 3;
+        border-top: var(--bw) solid var(--ink);
+      }
+
+      .head-actions {
+        width: 100%;
+        order: 2;
+        justify-content: stretch;
+      }
+
+      .head-actions .btn {
+        flex: 1;
+      }
+
+      .hero {
+        padding: 20px;
+      }
+
+      .notice .btn {
+        margin-left: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .ticker span,
+      .eq i {
+        animation: none;
+      }
+
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
 
-
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+  <!-- ================= MASTHEAD ================= -->
+  <div class="masthead">
+    <div class="ticker" aria-hidden="true">
+      <span>PAS DE MP3 SUR VOTRE STOCKAGE&nbsp;= PAS DE SON&nbsp;·&nbsp;LA BIBLIOTHÈQUE AFFICHE TOUT, NE LANCE QUE CE QUI EST LOCAL&nbsp;·&nbsp;RIEN N'EST TÉLÉVERSÉ&nbsp;·&nbsp;PAS DE MP3 SUR VOTRE STOCKAGE&nbsp;= PAS DE SON&nbsp;·&nbsp;LA BIBLIOTHÈQUE AFFICHE TOUT, NE LANCE QUE CE QUI EST LOCAL&nbsp;·&nbsp;RIEN N'EST TÉLÉVERSÉ&nbsp;·&nbsp;</span>
+    </div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="mark" aria-hidden="true"><i></i></span>
+        <span>
+          <h1>Brutalify</h1>
+          <small>Lecteur MP3 noir &amp; blanc</small>
+        </span>
+      </div>
+
+      <label class="search">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="7" cy="7" r="5" fill="none" stroke="#0b0b0b" stroke-width="2.4" />
+          <path d="M11 11l4 4" stroke="#0b0b0b" stroke-width="2.4" />
+        </svg>
+        <input type="search" id="search" placeholder="Rechercher un titre, un artiste…" autocomplete="off"
+          aria-label="Rechercher dans la bibliothèque" />
+      </label>
+
+      <div class="head-actions">
+        <span class="counter" id="counter">00/16 PRÊTS</span>
+        <button class="btn" id="btnFiles" type="button">Fichiers</button>
+        <button class="btn primary" id="btnScan" type="button">Balayer le stockage</button>
+      </div>
+    </header>
+  </div>
+
+  <!-- ================= SHELL ================= -->
+  <div class="shell">
+    <aside class="sidebar">
+      <section class="box">
+        <div class="box-h">Stockage local</div>
+        <div class="big"><span id="statReady">00</span><em>/16 prêts</em></div>
+        <div class="segs" id="segs" aria-hidden="true"></div>
+        <p class="mono-note" id="scanStatus">En attente de balayage… aucun mp3 référencé.</p>
+
+        <div class="stack">
+          <button class="btn primary block" id="btnScan2" type="button">Balayer un dossier</button>
+          <button class="btn block" id="btnFiles2" type="button">Choisir des MP3</button>
+        </div>
+
+        <div class="drop-hint">Ou déposez vos fichiers MP3 ici</div>
+      </section>
+
+      <nav class="box" aria-label="Filtres de la bibliothèque">
+        <div class="box-h">Bibliothèque</div>
+        <div class="chips">
+          <button class="chip on" data-filter="all" type="button">Tout <b id="cAll">16</b></button>
+          <button class="chip" data-filter="ready" type="button">Prêts <b id="cReady">0</b></button>
+          <button class="chip" data-filter="missing" type="button">Absents <b id="cMissing">16</b></button>
+        </div>
+      </nav>
+
+      <section class="box">
+        <div class="box-h">Règles</div>
+        <ol class="rulelist">
+          <li><b>01</b><span><strong>Couleur</strong>Noir, blanc, gris. Aucune exception.</span></li>
+          <li><b>02</b><span><strong>Nom + pochette</strong>Affichés pour chaque titre, verrou ou non.</span></li>
+          <li><b>03</b><span><strong>Lecture</strong>Uniquement si le MP3 existe sur votre stockage.</span></li>
+        </ol>
+        <p class="mono-note" style="margin-top:13px">
+          Rien n'est téléversé. Vos fichiers restent sur votre appareil : ils ne sont lus que pour lire
+          l'étiquette (titre, artiste, pochette) et le son.
+        </p>
+      </section>
+    </aside>
+
+    <main class="stage" id="stage">
+      <section class="hero">
+        <div>
+          <span class="kicker">Bibliothèque × brutalisme — édition noir &amp; blanc</span>
+          <h2>La musique ne se lance que si le <mark>MP3</mark> est chez vous.</h2>
+          <p>
+            BRUTALIFY affiche les noms et les pochettes de toute la bibliothèque, comme Spotify.
+            Mais chaque piste reste verrouillée tant qu'aucun fichier <strong>mp3</strong> correspondant
+            n'est trouvé sur votre stockage. Balayez un dossier, déposez vos fichiers : les titres
+            disponibles passent en « prêt », les autres restent hachurés.
+          </p>
+          <div class="hero-cta">
+            <button class="btn primary" id="btnScan3" type="button">Balayer mon stockage</button>
+            <span class="hint">Espace = lire / pause &nbsp;·&nbsp; / = recherche</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-h">Comment ça marche</div>
+          <ol>
+            <li><b>01</b><span><strong>Nom + pochette</strong>Lus dans le catalogue et dans vos étiquettes ID3.</span></li>
+            <li><b>02</b><span><strong>Recherche locale</strong>Le dossier est scruté à la recherche de mp3 correspondants.</span></li>
+            <li><b>03</b><span><strong>Verrou</strong>Sans fichier : affiché, mais bloqué. Avec fichier : ça joue.</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <div class="notice" id="notice">
+        <span class="notice-ic" aria-hidden="true">!</span>
+        <div>
+          <h4>Stockage non relié</h4>
+          <p>
+            Les 16 titres sont affichés, mais rien ne se lancera tant qu'aucun MP3 correspondant
+            ne sera trouvé sur votre appareil. Balayez un dossier ou déposez vos fichiers.
+          </p>
+        </div>
+        <button class="btn primary" id="btnScan4" type="button">Balayer maintenant</button>
+      </div>
+
+      <div class="stage-head">
+        <h3 id="sectionTitle">Toute la bibliothèque</h3>
+        <span class="mono" id="shownCount">16 titres</span>
+      </div>
+
+      <div class="grid" id="grid"></div>
+
+      <div class="empty" id="empty" hidden>
+        <h4>Aucun résultat</h4>
+        <p id="emptyText">Aucun titre ne correspond à cette recherche.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= PLAYER ================= -->
+  <footer class="player">
+    <div class="np">
+      <img class="art" id="npArt" alt="" />
+      <div class="txt">
+        <span class="badge" id="npBadge">Hors ligne</span>
+        <strong id="npTitle">Aucun titre sélectionné</strong>
+        <span id="npArtist">Balayez votre stockage pour déverrouiller</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="btns">
+        <button class="ctrl" id="btnPrev" type="button" aria-label="Précédent">&#9664;&#9664;</button>
+        <button class="ctrl main" id="btnPlay" type="button" aria-label="Lire">&#9654;</button>
+        <button class="ctrl" id="btnNext" type="button" aria-label="Suivant">&#9654;&#9654;</button>
+      </div>
+      <div class="seek-row">
+        <span id="tCur">0:00</span>
+        <input type="range" id="seek" min="0" max="1000" value="0" step="1" aria-label="Position de lecture"
+          disabled />
+        <span id="tDur">0:00</span>
+      </div>
+    </div>
+
+    <div class="aux">
+      <label class="vol">
+        <span>Vol</span>
+        <input type="range" id="vol" min="0" max="100" value="85" aria-label="Volume" />
+      </label>
+      <span class="local-badge">Lecture locale<br />uniquement</span>
+    </div>
+  </footer>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <div class="dropzone" id="dropzone">
+    <div>
+      <h3>Déposez vos MP3</h3>
+      <p>Glissez vos fichiers ou dossiers ici</p>
+    </div>
+  </div>
+
+  <input type="file" id="fileInput" accept=".mp3,audio/mpeg" multiple hidden />
+  <input type="file" id="dirInput" accept=".mp3,audio/mpeg" webkitdirectory directory multiple hidden />
+
+  <noscript>
+    <p style="padding:20px;font-family:monospace">BRUTALIFY a besoin de JavaScript pour lire vos MP3 locaux.</p>
+  </noscript>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ==========================================================
+         1. CATALOGUE — noms + pochettes affichés à tout le monde
+         ========================================================== */
+
+      var CATALOG = [
+        { id: "t01", title: "Blinding Lights", artist: "The Weeknd", album: "After Hours", dur: 200 },
+        { id: "t02", title: "Bad Guy", artist: "Billie Eilish", album: "When We All Fall Asleep", dur: 194 },
+        { id: "t03", title: "Levitating", artist: "Dua Lipa", album: "Future Nostalgia", dur: 203 },
+        { id: "t04", title: "Get Lucky", artist: "Daft Punk", album: "Random Access Memories", dur: 369 },
+        { id: "t05", title: "Midnight City", artist: "M83", album: "Hurry Up, We're Dreaming", dur: 244 },
+        { id: "t06", title: "Somebody That I Used to Know", artist: "Gotye", album: "Making Mirrors", dur: 244 },
+        { id: "t07", title: "Take On Me", artist: "a-ha", album: "Hunting High and Low", dur: 225 },
+        { id: "t08", title: "Feel Good Inc.", artist: "Gorillaz", album: "Demon Days", dur: 222 },
+        { id: "t09", title: "Rolling in the Deep", artist: "Adele", album: "21", dur: 228 },
+        { id: "t10", title: "Uptown Funk", artist: "Mark Ronson feat. Bruno Mars", album: "Uptown Special", dur: 270 },
+        { id: "t11", title: "Do I Wanna Know?", artist: "Arctic Monkeys", album: "AM", dur: 272 },
+        { id: "t12", title: "Désenchantée", artist: "Mylène Farmer", album: "Anamorphosée", dur: 323 },
+        { id: "t13", title: "Blue (Da Ba Dee)", artist: "Eiffel 65", album: "Europop", dur: 285 },
+        { id: "t14", title: "Crazy", artist: "Gnarls Barkley", album: "St. Elsewhere", dur: 178 },
+        { id: "t15", title: "Kids", artist: "MGMT", album: "Oracular Spectacular", dur: 302 },
+        { id: "t16", title: "Around the World", artist: "Daft Punk", album: "Homework", dur: 429 }
+      ];
+
+      var state = {
+        tracks: [],
+        query: "",
+        filter: "all",
+        currentId: null,
+        playing: false,
+        scanMsg: ""
+      };
+
+      /* ==========================================================
+         2. UTILITAIRES
+         ========================================================== */
+
+      function $(id) { return document.getElementById(id); }
+
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+      }
+
+      function norm(s) {
+        return String(s || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "");
+      }
+
+      function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
+      function fmt(sec) {
+        if (!isFinite(sec) || sec < 0) sec = 0;
+        var m = Math.floor(sec / 60);
+        var s = Math.floor(sec % 60);
+        return m + ":" + pad2(s);
+      }
+
+      function hash(str) {
+        var h = 2166136261;
+        for (var i = 0; i < str.length; i++) {
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return Math.abs(h);
+      }
+
+      /* --- pochette de secours : SVG brutaliste en niveaux de gris --- */
+
+      function fallbackCover(t) {
+        var h = hash(t.title + "|" + t.artist);
+        var p = h % 6;
+        var letters = (t.title.match(/[A-Za-z0-9]/g) || ["?", "?"]).slice(0, 2).join("").toUpperCase();
+        var W = 600, H = 600;
+        var bg = "#e7e7e7", s = "";
+
+        if (p === 0) {
+          for (var i = 0; i < 9; i++) {
+            s += '<rect x="0" y="' + i * 66 + '" width="600" height="34" fill="' +
+              (i % 2 ? "#0b0b0b" : "#9c9c9c") + '" opacity="' + (i % 2 ? "1" : ".55") + '"/>';
+          }
+        } else if (p === 1) {
+          s += '<circle cx="330" cy="250" r="180" fill="none" stroke="#0b0b0b" stroke-width="26"/>';
+          s += '<path d="M330 70 a180 180 0 0 1 0 360 Z" fill="#0b0b0b"/>';
+          s += '<rect x="40" y="430" width="520" height="24" fill="#6f6f6f"/>';
+        } else if (p === 2) {
+          for (var j = -12; j < 24; j++) {
+            s += '<rect x="' + j * 44 + '" y="-200" width="18" height="1000" fill="#0b0b0b" opacity=".5" transform="rotate(45 300 300)"/>';
+          }
+        } else if (p === 3) {
+          for (var r = 0; r < 4; r++) {
+            for (var c = 0; c < 4; c++) {
+              if ((r + c) % 2 === 0) {
+                s += '<rect x="' + c * 150 + '" y="' + r * 150 + '" width="150" height="150" fill="#0b0b0b"/>';
+              }
+            }
+          }
+        } else if (p === 4) {
+          var cols = ["#0b0b0b", "#ffffff", "#9c9c9c", "#0b0b0b", "#e7e7e7"];
+          for (var k = 0; k < 5; k++) {
+            var inset = k * 60;
+            s += '<rect x="' + inset + '" y="' + inset + '" width="' + (600 - inset * 2) +
+              '" height="' + (600 - inset * 2) + '" fill="' + cols[k] + '" stroke="#0b0b0b" stroke-width="6"/>';
+          }
+        } else {
+          var widths = [16, 44, 10, 70, 26, 12, 54, 18, 34, 90, 14, 48];
+          var x = 26;
+          for (var b = 0; b < widths.length; b++) {
+            s += '<rect x="' + x + '" y="0" width="' + widths[b] + '" height="470" fill="#0b0b0b"/>';
+            x += widths[b] + 20;
+            if (x > 560) break;
+          }
+          s += '<rect x="0" y="470" width="600" height="130" fill="#0b0b0b"/>';
+        }
+
+        var dark = (p === 0 || p === 3 || p === 5);
+        var labelBg = dark ? "#ffffff" : "#0b0b0b";
+        var labelFg = dark ? "#0b0b0b" : "#ffffff";
+        if (p === 4) { labelBg = "#ffffff"; labelFg = "#0b0b0b"; }
+
+        var svg =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 600 600">' +
+          '<rect width="600" height="600" fill="' + bg + '"/>' + s +
+          '<rect x="34" y="474" width="200" height="94" fill="' + labelBg + '" stroke="#0b0b0b" stroke-width="8"/>' +
+          '<text x="134" y="541" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="58" font-weight="900" fill="' + labelFg + '">' +
+          esc(letters) + "</text>" +
+          "</svg>";
+
+        return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+      }
+
+      /* ==========================================================
+         3. POCHETTES EN LIGNE (JSONP iTunes) — avec repli local
+         ========================================================== */
+
+      var jsonpSeq = 0;
+
+      function jsonp(url, timeout) {
+        return new Promise(function (resolve, reject) {
+          var cb = "brutalify_cb_" + (++jsonpSeq);
+          var el = document.createElement("script");
+          var timer = setTimeout(function () { cleanup(); reject(new Error("timeout")); }, timeout || 8000);
+          function cleanup() {
+            clearTimeout(timer);
+            try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+            if (el.parentNode) el.parentNode.removeChild(el);
+          }
+          window[cb] = function (data) { cleanup(); resolve(data); };
+          el.onerror = function () { cleanup(); reject(new Error("network")); };
+          el.src = url + (url.indexOf("?") >= 0 ? "&" : "?") + "callback=" + cb;
+          document.head.appendChild(el);
+        });
+      }
+
+      function loadCover(t) {
+        var term = t.artist + " " + t.title;
+        var url = "https://itunes.apple.com/search?term=" + encodeURIComponent(term) +
+          "&entity=song&limit=6&country=FR";
+        return jsonp(url).then(function (data) {
+          var results = (data && data.results) || [];
+          var pick = null;
+          for (var i = 0; i < results.length; i++) {
+            if (norm(results[i].trackName) === norm(t.title)) { pick = results[i]; break; }
+          }
+          if (!pick) {
+            var want = norm(t.title);
+            for (var j = 0; j < results.length && want; j++) {
+              var nm = norm(results[j].trackName);
+              if (nm && nm.indexOf(want) >= 0) { pick = results[j]; break; }
+            }
+          }
+          if (!pick && results.length) pick = results[0];
+          if (!pick || !pick.artworkUrl100) return null;
+          var art = pick.artworkUrl100.replace(/\/\d+x\d+bb/, "/600x600bb");
+          if (t.localCover) return null;     // la pochette embarquée du mp3 prime
+          t.cover = art;
+          var img = document.querySelector('img[data-cid="' + t.id + '"]');
+          if (img) img.src = art;
+          if (state.currentId === t.id) $("npArt").src = art;
+          return art;
+        }).catch(function () { return null; });
+      }
+
+      /* ==========================================================
+         4. LECTURE D'ÉTIQUETTES ID3 (v2.2 / v2.3 / v2.4)
+         ========================================================== */
+
+      function ss(b, i) {
+        return ((b[i] & 0x7f) << 21) | ((b[i + 1] & 0x7f) << 14) | ((b[i + 2] & 0x7f) << 7) | (b[i + 3] & 0x7f);
+      }
+
+      function dec16(body) {
+        if (body.length >= 2 && body[0] === 0xff && body[1] === 0xfe) return new TextDecoder("utf-16le").decode(body.subarray(2));
+        if (body.length >= 2 && body[0] === 0xfe && body[1] === 0xff) return new TextDecoder("utf-16be").decode(body.subarray(2));
+        return new TextDecoder("utf-16le").decode(body);
+      }
+
+      function decodeText(bytes) {
+        if (!bytes || !bytes.length) return "";
+        var enc = bytes[0];
+        var body = bytes.subarray(1);
+        var out = "";
+        try {
+          if (enc === 0) out = new TextDecoder("windows-1252").decode(body);
+          else if (enc === 1) out = dec16(body);
+          else if (enc === 2) out = new TextDecoder("utf-16be").decode(body);
+          else out = new TextDecoder("utf-8").decode(body);
+        } catch (e) { out = ""; }
+        return out.replace(/\u0000+/g, "").trim();
+      }
+
+      function parseAPIC(bytes, v22) {
+        if (!bytes || bytes.length < 4) return null;
+        var enc = bytes[0];
+        var i = 1;
+        var mime = "";
+
+        if (v22) {
+          var fmt = "";
+          while (i < bytes.length && bytes[i] !== 0) { fmt += String.fromCharCode(bytes[i]); i++; }
+          i++;
+          mime = /png/i.test(fmt) ? "image/png" : "image/jpeg";
+        } else {
+          while (i < bytes.length && bytes[i] !== 0) { mime += String.fromCharCode(bytes[i]); i++; }
+          i++;
+          i++; /* picture type */
+        }
+
+        if (enc === 1 || enc === 2) {
+          if (bytes[i] === 0xff && bytes[i + 1] === 0xfe) i += 2;
+          else if (bytes[i] === 0xfe && bytes[i + 1] === 0xff) i += 2;
+          while (i + 1 < bytes.length && !(bytes[i] === 0 && bytes[i + 1] === 0)) i += 2;
+          i += 2;
+        } else {
+          while (i < bytes.length && bytes[i] !== 0) i++;
+          i++;
+        }
+
+        if (i >= bytes.length) return null;
+        if (!mime) mime = "image/jpeg";
+        return new Blob([bytes.subarray(i)], { type: mime });
+      }
+
+      function titleFromFilename(name) {
+        var t = String(name).replace(/\.[^.]+$/, "").replace(/[_]+/g, " ");
+        t = t.replace(/^\s*\d{1,3}\s*[-._)]*\s*/, "");
+        return t.trim();
+      }
+
+      function readID3(file) {
+        var out = { title: null, artist: null, album: null, cover: null, filename: file.name };
+        return file.slice(0, 10).arrayBuffer().then(function (hb) {
+          var head = new Uint8Array(hb);
+          if (head.length < 10 || head[0] !== 0x49 || head[1] !== 0x44 || head[2] !== 0x33) return null;
+          var tagSize = ss(head, 6);
+          var end = Math.min(file.size, 10 + tagSize, 3 * 1024 * 1024);
+          if (end <= 10) return false;
+          return file.slice(0, end).arrayBuffer();
+        }).then(function (buf) {
+          if (buf === false || buf === null) {
+            out.title = titleFromFilename(file.name);
+            return out;
+          }
+          var u8 = new Uint8Array(buf);
+          var dv = new DataView(buf);
+          var ver = u8[3];
+          var p = 10;
+
+          if (u8[5] & 0x40) {
+            if (ver === 4) p = 10 + ss(u8, 10);
+            else p = 14 + dv.getUint32(10);
+            if (!isFinite(p) || p < 10 || p >= u8.length) p = 10;
+          }
+
+          var frames = {};
+
+          if (ver === 2) {
+            while (p + 6 <= u8.length) {
+              var id3 = String.fromCharCode(u8[p], u8[p + 1], u8[p + 2]);
+              if (!/^[A-Z0-9]{3}$/.test(id3)) break;
+              var sz3 = (u8[p + 3] << 16) | (u8[p + 4] << 8) | u8[p + 5];
+              if (sz3 <= 0 || p + 6 + sz3 > u8.length) break;
+              frames[id3] = { s: p + 6, n: sz3, v22: true };
+              p += 6 + sz3;
+            }
+          } else {
+            while (p + 10 <= u8.length) {
+              var id4 = String.fromCharCode(u8[p], u8[p + 1], u8[p + 2], u8[p + 3]);
+              if (!/^[A-Z0-9]{4}$/.test(id4)) break;
+              var sz4 = ver === 4 ? ss(u8, p + 4) : dv.getUint32(p + 4);
+              if (sz4 <= 0 || p + 10 + sz4 > u8.length) break;
+              frames[id4] = { s: p + 10, n: sz4 };
+              p += 10 + sz4;
+            }
+          }
+
+          var f = frames.TIT2 || frames.TT2;
+          if (f) out.title = decodeText(u8.subarray(f.s, f.s + f.n)) || null;
+          f = frames.TPE1 || frames.TP1;
+          if (f) out.artist = decodeText(u8.subarray(f.s, f.s + f.n)) || null;
+          f = frames.TALB || frames.TAL;
+          if (f) out.album = decodeText(u8.subarray(f.s, f.s + f.n)) || null;
+          f = frames.APIC || frames.PIC;
+          if (f && f.n > 0 && f.n < 2 * 1024 * 1024) {
+            try { out.cover = parseAPIC(u8.subarray(f.s, f.s + f.n), !!f.v22); } catch (e) { out.cover = null; }
+          }
+
+          if (!out.title) out.title = titleFromFilename(file.name);
+          return out;
+        }).catch(function (e) {
+          if (window.console && console.warn) console.warn("[BRUTALIFY] ID3 illisible : " + file.name, e);
+          if (!out.title) out.title = titleFromFilename(file.name);
+          return out;
+        });
+      }
+
+      /* ==========================================================
+         5. APPARIEMENT LOCAL ↔ CATALOGUE
+         ========================================================== */
+
+      function scoreMatch(local, t) {
+        var lt = norm(local.title) || norm(local.filename);
+        var la = norm(local.artist);
+        var lf = norm(local.filename);
+        var tt = norm(t.title);
+        var ta = norm(t.artist);
+        if (!lt && !lf) return 0;
+
+        var titleHit = !!tt && (lt === tt || (lt.length > 3 && tt.length > 3 && (lt.indexOf(tt) >= 0 || tt.indexOf(lt) >= 0)));
+        var artistOk = !la || !ta || la === ta || la.indexOf(ta) >= 0 || ta.indexOf(la) >= 0;
+        var fileHit = tt.length > 3 && (lf.indexOf(tt) >= 0 || tt.indexOf(lf) >= 0);
+        var fileArtistOk = !ta || lf.indexOf(ta) >= 0;
+
+        if (titleHit && artistOk) return 3;
+        if (titleHit) return 2;
+        if (fileHit && fileArtistOk) return 2;
+        if (fileHit) return 1;
+        return 0;
+      }
+
+      /* ==========================================================
+         6. BALAYAGE DU STOCKAGE
+         ========================================================== */
+
+      function isMp3(f) {
+        return /\.mp3$/i.test(f.name) || f.type === "audio/mpeg" || f.type === "audio/mp3";
+      }
+
+      function setScanMsg(msg) {
+        state.scanMsg = msg;
+        renderSidebar();
+      }
+
+      async function walkHandle(dir, out, depth) {
+        if (depth > 6 || out.length >= 500) return;
+        if (typeof dir.values !== "function") return;
+        for await (const handle of dir.values()) {
+          if (out.length >= 500) break;
+          if (handle.kind === "directory") {
+            await walkHandle(handle, out, depth + 1);
+          } else if (handle.kind === "file" && /\.mp3$/i.test(handle.name)) {
+            try { out.push(await handle.getFile()); } catch (e) { /* ignore */ }
+          }
+        }
+      }
+
+      function scanDirectory() {
+        if (typeof window.showDirectoryPicker !== "function") {
+          $("dirInput").click();
+          return;
+        }
+        window.showDirectoryPicker({ mode: "read" }).then(function (dir) {
+          var out = [];
+          setScanMsg("Recherche des mp3 dans le dossier…");
+          return walkHandle(dir, out, 0).then(function () { ingest(out); });
+        }).catch(function (err) {
+          if (err && err.name === "AbortError") return;
+          setScanMsg("Dossier inaccessible — sélectionnez vos MP3 un par un.");
+          toast("Accès dossier refusé — utilisez le bouton « Fichiers »", "bad");
+          $("dirInput").click();
+        });
+      }
+
+      function walkEntry(entry, out, depth) {
+        if (!entry || depth > 6 || out.length >= 500) return Promise.resolve();
+        if (entry.isFile) {
+          return new Promise(function (res) {
+            entry.file(function (f) { if (isMp3(f)) out.push(f); res(); }, function () { res(); });
+          });
+        }
+        if (entry.isDirectory) {
+          var reader = entry.createReader();
+          function readAll() {
+            return new Promise(function (res) {
+              reader.readEntries(function (batch) { res(batch); }, function () { res([]); });
+            }).then(function (batch) {
+              if (!batch.length) return null;
+              var chain = Promise.resolve();
+              batch.forEach(function (e) {
+                chain = chain.then(function () { return walkEntry(e, out, depth + 1); });
+              });
+              return chain.then(readAll);
+            });
+          }
+          return readAll();
+        }
+        return Promise.resolve();
+      }
+
+      function filesFromDataTransfer(dt) {
+        var out = [];
+        var entries = [];
+        if (dt.items) {
+          Array.prototype.forEach.call(dt.items, function (it) {
+            if (it.kind === "file" && it.webkitGetAsEntry) {
+              var e = it.webkitGetAsEntry();
+              if (e) entries.push(e);
+            }
+          });
+        }
+        if (entries.length) {
+          var chain = Promise.resolve();
+          entries.forEach(function (e) {
+            chain = chain.then(function () { return walkEntry(e, out, 0); });
+          });
+          return chain.then(function () { return out; });
+        }
+        Array.prototype.forEach.call(dt.files || [], function (f) { if (isMp3(f)) out.push(f); });
+        return Promise.resolve(out);
+      }
+
+      function ingest(files) {
+        var mp3s = (files || []).filter(isMp3).slice(0, 500);
+        if (!mp3s.length) {
+          setScanMsg("Aucun fichier MP3 détecté.");
+          toast("Aucun MP3 détecté dans votre sélection", "bad");
+          return Promise.resolve();
+        }
+
+        setScanMsg("Lecture des étiquettes : 0/" + mp3s.length);
+
+        var parsed = [];
+        var i = 0;
+
+        function nextBatch() {
+          if (i >= mp3s.length) return Promise.resolve();
+          var batch = mp3s.slice(i, i + 6);
+          i += batch.length;
+          return Promise.all(batch.map(function (f) {
+            return readID3(f).catch(function () { return null; });
+          })).then(function (res) {
+            res.forEach(function (r, k) {
+              if (r) { r.file = batch[k]; parsed.push(r); }
+            });
+            setScanMsg("Lecture des étiquettes : " + Math.min(i, mp3s.length) + "/" + mp3s.length);
+            return nextBatch();
+          });
+        }
+
+        return nextBatch().then(function () {
+          var thresholds = [3, 2, 1];
+          thresholds.forEach(function (min) {
+            parsed.forEach(function (local) {
+              if (local.consumed) return;
+              var target = null;
+              var best = 0;
+              state.tracks.forEach(function (t) {
+                if (t.file) return;
+                var s = scoreMatch(local, t);
+                if (s >= min && s > best) { best = s; target = t; }
+              });
+              if (target) {
+                local.consumed = true;
+                target.file = local.file;
+                if (local.cover && !target.localCover) {
+                  target.localCover = true;
+                  target.cover = URL.createObjectURL(local.cover);
+                }
+              }
+            });
+          });
+
+          var ready = state.tracks.filter(function (t) { return !!t.file; }).length;
+          var unmatched = parsed.filter(function (l) { return !l.consumed; }).length;
+
+          setScanMsg(ready + " mp3 correspondant(s) en mémoire — session en cours uniquement.");
+
+          if (ready > 0) {
+            toast(ready + " titre" + (ready > 1 ? "s" : "") + " déverrouillé" + (ready > 1 ? "s" : "") +
+              " sur " + state.tracks.length, "ok");
+          } else {
+            toast("Aucun mp3 du catalogue trouvé sur votre stockage", "bad");
+          }
+          if (unmatched > 0) {
+            toast(unmatched + " mp3 sans correspondance dans la bibliothèque", "info");
+          }
+
+          render();
+        });
+      }
+
+      /* ==========================================================
+         7. LECTURE AUDIO (uniquement si fichier local présent)
+         ========================================================== */
+
+      var audio = new Audio();
+      audio.preload = "metadata";
+      audio.volume = 0.85;
+      var currentUrl = null;
+
+      function byId(id) {
+        for (var i = 0; i < state.tracks.length; i++) {
+          if (state.tracks[i].id === id) return state.tracks[i];
+        }
+        return null;
+      }
+
+      function current() { return state.currentId ? byId(state.currentId) : null; }
+
+      function readyTracks() {
+        return state.tracks.filter(function (t) { return !!t.file; });
+      }
+
+      function rejectLocked(t) {
+        var card = document.querySelector('.card[data-id="' + t.id + '"]');
+        if (card) {
+          card.classList.remove("shake");
+          void card.offsetWidth;
+          card.classList.add("shake");
+          setTimeout(function () { card.classList.remove("shake"); }, 600);
+        }
+        toast("« " + t.title + " » absent de votre stockage — lecture bloquée", "bad");
+      }
+
+      function play() {
+        var p = audio.play();
+        if (p && p.catch) {
+          p.catch(function (err) {
+            toast("Lecture refusée : " + (err && err.message ? err.message : "erreur inconnue"), "bad");
+          });
+        }
+      }
+
+      function select(t) {
+        if (!t) return;
+        if (!t.file) { rejectLocked(t); return; }
+
+        if (state.currentId === t.id) {
+          if (audio.paused) play(); else audio.pause();
+          return;
+        }
+
+        audio.pause();
+        if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
+        currentUrl = URL.createObjectURL(t.file);
+        state.currentId = t.id;
+        audio.src = currentUrl;
+        audio.currentTime = 0;
+        play();
+        render();
+      }
+
+      function toggle() {
+        var t = current();
+        if (!t) {
+          var list = readyTracks();
+          if (list.length) { select(list[0]); }
+          else { toast("Aucun MP3 prêt — balayez votre stockage", "bad"); }
+          return;
+        }
+        if (audio.paused) play(); else audio.pause();
+      }
+
+      function step(dir) {
+        var list = visibleTracks().filter(function (t) { return !!t.file; });
+        if (!list.length) list = readyTracks();
+        if (!list.length) { toast("Aucun MP3 prêt — balayez votre stockage", "bad"); return; }
+
+        var idx = -1;
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].id === state.currentId) { idx = i; break; }
+        }
+        var nextIdx;
+        if (idx === -1) nextIdx = dir > 0 ? 0 : list.length - 1;
+        else nextIdx = (idx + dir + list.length) % list.length;
+
+        select(list[nextIdx]);
+      }
+
+      audio.addEventListener("play", function () { state.playing = true; render(); });
+      audio.addEventListener("pause", function () { state.playing = false; render(); });
+      audio.addEventListener("ended", function () { step(1); });
+      audio.addEventListener("loadedmetadata", updateProgress);
+      audio.addEventListener("timeupdate", updateProgress);
+      audio.addEventListener("error", function () {
+        if (audio.src) toast("Fichier illisible par le navigateur", "bad");
+      });
+
+      function updateProgress() {
+        var t = current();
+        var dur = isFinite(audio.duration) && audio.duration > 0
+          ? audio.duration
+          : (t ? t.dur : 0);
+        var cur = audio.currentTime || 0;
+        var pct = dur ? (cur / dur) * 100 : 0;
+        var seek = $("seek");
+        seek.style.setProperty("--p", pct.toFixed(2));
+        if (!seek.dragging) seek.value = Math.round((dur ? cur / dur : 0) * 1000);
+        $("tCur").textContent = fmt(cur);
+        $("tDur").textContent = fmt(dur);
+      }
+
+      /* ==========================================================
+         8. RENDU
+         ========================================================== */
+
+      function visibleTracks() {
+        var q = norm(state.query);
+        return state.tracks.filter(function (t) {
+          if (state.filter === "ready" && !t.file) return false;
+          if (state.filter === "missing" && t.file) return false;
+          if (q) {
+            var hay = norm(t.title) + norm(t.artist) + norm(t.album);
+            if (hay.indexOf(q) < 0) return false;
+          }
+          return true;
+        });
+      }
+
+      function cardHTML(t, i) {
+        var ready = !!t.file;
+        var on = state.currentId === t.id && state.playing;
+        var stateLabel = on ? "En lecture" : (ready ? "Prêt" : "Absent");
+        var cta = ready
+          ? (on ? "&#10074;&#10074; En lecture" : "&#9654; Lire")
+          : "&#10005; Absent — balayage requis";
+
+        return '<article class="card ' + (ready ? "ready" : "locked") + (on ? " on" : "") +
+          '" data-id="' + t.id + '" tabindex="0" role="button" aria-label="' +
+          esc(t.title + " — " + t.artist + (ready ? " : prêt" : " : absent")) + '">' +
+          '<div class="cover">' +
+          '<img src="' + esc(t.cover) + '" alt="' + esc(t.title + " — " + t.artist) + '" loading="lazy" data-cid="' + t.id + '" />' +
+          '<span class="num">' + pad2(i + 1) + "</span>" +
+          '<span class="state">' + stateLabel + "</span>" +
+          (on ? '<span class="eq"><i></i><i></i><i></i></span>' : "") +
+          (ready ? "" :
+            '<span class="lock"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">' +
+            '<rect x="3" y="10" width="18" height="12" fill="#0b0b0b"/>' +
+            '<path d="M7 10V7a5 5 0 0 1 10 0v3" fill="none" stroke="#0b0b0b" stroke-width="3"/>' +
+            '<rect x="10.5" y="14" width="3" height="5" fill="#fff"/></svg></span>') +
+          "</div>" +
+          '<div class="meta">' +
+          "<h4>" + esc(t.title) + "</h4>" +
+          '<div class="artist">' + esc(t.artist) + "</div>" +
+          '<div class="meta-row"><span class="album">' + esc(t.album) + '</span><span class="dur">' + fmt(t.dur) + "</span></div>" +
+          "</div>" +
+          '<div class="cta ' + (ready ? "go" : "no") + '">' + cta + "</div>" +
+          "</article>";
+      }
+
+      function renderGrid() {
+        var list = visibleTracks();
+        $("grid").innerHTML = list.map(cardHTML).join("");
+        $("empty").hidden = list.length > 0;
+        if (!list.length) {
+          $("emptyText").textContent = state.query
+            ? "Aucun titre ne correspond à « " + state.query + " »."
+            : "Aucun titre dans ce filtre pour l'instant.";
+        }
+      }
+
+      function renderSidebar() {
+        var ready = state.tracks.filter(function (t) { return !!t.file; }).length;
+        var total = state.tracks.length;
+        $("statReady").textContent = pad2(ready);
+        $("counter").textContent = pad2(ready) + "/" + total + " prêts";
+        $("cAll").textContent = total;
+        $("cReady").textContent = ready;
+        $("cMissing").textContent = total - ready;
+        $("segs").innerHTML = state.tracks.map(function (t) {
+          return '<i class="' + (t.file ? "on" : "") + '"></i>';
+        }).join("");
+        $("scanStatus").textContent = state.scanMsg ||
+          (ready ? ready + " mp3 correspondant(s) en mémoire." : "En attente de balayage… aucun mp3 référencé.");
+        $("notice").hidden = ready > 0;
+
+        var chips = document.querySelectorAll(".chip");
+        Array.prototype.forEach.call(chips, function (c) {
+          c.classList.toggle("on", c.getAttribute("data-filter") === state.filter);
+        });
+      }
+
+      function renderPlayer() {
+        var t = current();
+        var playBtn = $("btnPlay");
+        playBtn.innerHTML = state.playing ? "&#10074;&#10074;" : "&#9654;";
+        playBtn.setAttribute("aria-label", state.playing ? "Pause" : "Lire");
+
+        if (t) {
+          $("npArt").src = t.cover;
+          $("npArt").alt = t.title;
+          $("npTitle").textContent = t.title;
+          $("npArtist").textContent = t.artist + " — " + t.album;
+          $("npBadge").textContent = state.playing ? "En lecture" : "Prêt";
+          $("seek").disabled = false;
+        } else {
+          $("npArt").removeAttribute("src");
+          $("npArt").alt = "";
+          $("npTitle").textContent = "Aucun titre sélectionné";
+          $("npArtist").textContent = "Balayez votre stockage pour déverrouiller";
+          $("npBadge").textContent = "Hors ligne";
+          $("seek").disabled = true;
+          $("seek").value = 0;
+          $("seek").style.setProperty("--p", 0);
+          $("tCur").textContent = "0:00";
+          $("tDur").textContent = "0:00";
+        }
+
+        var hasReady = state.tracks.some(function (x) { return !!x.file; });
+        $("btnPrev").disabled = !hasReady;
+        $("btnNext").disabled = !hasReady;
+        $("btnPlay").disabled = false;
+        updateProgress();
+      }
+
+      function renderHead() {
+        var titles = { all: "Toute la bibliothèque", ready: "Titres prêts", missing: "Titres absents" };
+        $("sectionTitle").textContent = titles[state.filter];
+        var n = visibleTracks().length;
+        $("shownCount").textContent = n + " titre" + (n > 1 ? "s" : "") +
+          (state.filter === "ready" ? " jouable" + (n > 1 ? "s" : "") : "");
+      }
+
+      function render() {
+        renderGrid();
+        renderSidebar();
+        renderPlayer();
+        renderHead();
+      }
+
+      /* ==========================================================
+         9. TOASTS
+         ========================================================== */
+
+      function toast(msg, kind) {
+        var box = document.createElement("div");
+        box.className = "toast " + (kind || "info");
+        var p = document.createElement("p");
+        p.textContent = msg;
+        box.appendChild(p);
+        box.addEventListener("click", function () { if (box.parentNode) box.parentNode.removeChild(box); });
+        $("toasts").appendChild(box);
+        setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 5200);
+      }
+
+      /* ==========================================================
+         10. ÉVÉNEMENTS
+         ========================================================== */
+
+      function openFiles() { $("fileInput").value = ""; $("fileInput").click(); }
+      function openScan() { scanDirectory(); }
+
+      ["btnScan", "btnScan2", "btnScan3", "btnScan4"].forEach(function (id) {
+        var el = $(id);
+        if (el) el.addEventListener("click", openScan);
+      });
+      ["btnFiles", "btnFiles2"].forEach(function (id) {
+        var el = $(id);
+        if (el) el.addEventListener("click", openFiles);
+      });
+
+      $("fileInput").addEventListener("change", function (e) {
+        ingest(Array.prototype.slice.call(e.target.files || []));
+      });
+      $("dirInput").addEventListener("change", function (e) {
+        ingest(Array.prototype.slice.call(e.target.files || []));
+      });
+
+      $("search").addEventListener("input", function (e) {
+        state.query = e.target.value;
+        renderGrid();
+        renderHead();
+      });
+
+      document.querySelector(".chips").addEventListener("click", function (e) {
+        var chip = e.target.closest(".chip");
+        if (!chip) return;
+        state.filter = chip.getAttribute("data-filter");
+        renderSidebar();
+        renderGrid();
+        renderHead();
+      });
+
+      $("grid").addEventListener("click", function (e) {
+        var card = e.target.closest(".card");
+        if (!card) return;
+        select(byId(card.getAttribute("data-id")));
+      });
+
+      $("grid").addEventListener("keydown", function (e) {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        var card = e.target.closest(".card");
+        if (!card) return;
+        e.preventDefault();
+        select(byId(card.getAttribute("data-id")));
+      });
+
+      $("btnPlay").addEventListener("click", toggle);
+      $("btnPrev").addEventListener("click", function () { step(-1); });
+      $("btnNext").addEventListener("click", function () { step(1); });
+
+      var seek = $("seek");
+      seek.addEventListener("pointerdown", function () { seek.dragging = true; });
+      window.addEventListener("pointerup", function () { seek.dragging = false; });
+      seek.addEventListener("input", function () {
+        var t = current();
+        var dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (t ? t.dur : 0);
+        var pct = seek.value / 1000;
+        seek.style.setProperty("--p", (pct * 100).toFixed(2));
+        if (dur) {
+          audio.currentTime = pct * dur;
+          $("tCur").textContent = fmt(audio.currentTime);
+        }
+      });
+
+      var vol = $("vol");
+      function applyVol() {
+        audio.volume = vol.value / 100;
+        vol.style.setProperty("--p", vol.value);
+      }
+      vol.addEventListener("input", applyVol);
+      applyVol();
+
+      document.addEventListener("keydown", function (e) {
+        var el = e.target || {};
+        var tag = (el.tagName || "").toLowerCase();
+        var typing = tag === "input" || tag === "textarea" || el.isContentEditable;
+        if (typing) return;
+        if (e.code === "Space" && tag !== "button") {
+          e.preventDefault();
+          toggle();
+        } else if (e.key === "/") {
+          e.preventDefault();
+          $("search").focus();
+        }
+      });
+
+      /* glisser-déposer */
+      var dragDepth = 0;
+      window.addEventListener("dragenter", function (e) {
+        e.preventDefault();
+        dragDepth++;
+        document.body.classList.add("dragging");
+      });
+      window.addEventListener("dragover", function (e) { e.preventDefault(); });
+      window.addEventListener("dragleave", function (e) {
+        e.preventDefault();
+        dragDepth = Math.max(0, dragDepth - 1);
+        if (dragDepth === 0) document.body.classList.remove("dragging");
+      });
+      window.addEventListener("drop", function (e) {
+        e.preventDefault();
+        dragDepth = 0;
+        document.body.classList.remove("dragging");
+        var dt = e.dataTransfer;
+        if (!dt) return;
+        setScanMsg("Dépôt détecté — lecture des étiquettes…");
+        filesFromDataTransfer(dt).then(function (files) { ingest(files); });
+      });
+
+      /* nettoyage */
+      window.addEventListener("beforeunload", function () {
+        if (currentUrl) URL.revokeObjectURL(currentUrl);
+      });
+
+      /* ==========================================================
+         11. DÉMARRAGE
+         ========================================================== */
+
+      state.tracks = CATALOG.map(function (t) {
+        return {
+          id: t.id,
+          title: t.title,
+          artist: t.artist,
+          album: t.album,
+          dur: t.dur,
+          cover: fallbackCover(t),
+          localCover: false,
+          file: null
+        };
+      });
+
+      render();
+
+      state.tracks.forEach(function (t) { loadCover(t); });
+
+      toast("Bienvenue — la bibliothèque est affichée, la lecture reste verrouillée", "info");
+    })();
+  </script>
 </body>
 
 </html>
