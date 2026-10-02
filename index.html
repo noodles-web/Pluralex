@@ -74,6 +74,13 @@
       cursor: pointer;
     }
 
+    /* Freebuff entrypoint (src/main.tsx) stays mounted for route sync,
+       the preview toolbar and the auth providers, but it is hidden so the
+       BRUTALIFY markup above owns the visible page. */
+    #root {
+      display: none;
+    }
+
     ::selection {
       background: var(--ink);
       color: #fff;
@@ -2554,6 +2561,11 @@
       toast("Bienvenue — la bibliothèque est affichée, la lecture reste verrouillée", "info");
     })();
   </script>
+
+  <!-- Freebuff entrypoint: React shell (route sync, preview toolbar, providers).
+       Hidden via CSS so BRUTALIFY remains the visible page. -->
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 
 </html>
